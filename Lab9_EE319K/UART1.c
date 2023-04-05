@@ -82,8 +82,8 @@ void UART1_Init(void){
 
 char UART1_InChar(void){
   // write this
-//    while((UART1_FR_R&0x0010) != 0); // wait until RXFE is 0
     while(Fifo_Get() == 0) {};
+    // wait until RXFE is 0
     return Fifo_Get();
 }
 // Wait for new input, then return ASCII code
@@ -105,7 +105,8 @@ void UART1_InMessage(char *bufPt){
 // Output: none
 void UART1_OutChar(char data){
   // write this
-    while((UART1_FR_R&0x0020) != 0); // wait until TXFF is 0
+    while((UART1_FR_R&0x0020) != 0);
+    // wait until TXFF is 0
     UART1_DR_R = data;
 }
 #define PF1       (*((volatile uint32_t *)0x40025008))
@@ -116,15 +117,23 @@ void UART1_OutChar(char data){
 uint32_t RxCounter = 0;
 void UART1_Handler(void){
   char x;
-  PF2 ^= 0x04;  // Heartbeat toggle
-  PF2 ^= 0x04;  // Heartbeat toggle
-  while((UART1_FR_R&0x0010) == 0) { // wait until RXFE bit in UART1_FR_R is 0 (should be 8 bytes)
-      x = (UART1_DR_R & 0xFF); // read last byte from UART1_DR_R
+  //0) toggle a heartbeat (change from 0 to 1, or from 1 to 0), 
+  PF2 ^= 0x04;  
+  //1) toggle a heartbeat (change from 0 to 1, or from 1 to 0), 
+  PF2 ^= 0x04;  
+  //2) as long as the RXFE bit in the UART1_FR_R is zero (should be exactly 8 bytes, but could be more or less)
+  while((UART1_FR_R&0x0010) == 0) { 
+  //   -Read a byte from UART1_DR_R 
+      x = (UART1_DR_R & 0xFF); 
+  //   -Put the byte into your software FIFO 
       Fifo_Put(x);
   }
+  //3) Increment a RxCounter, used as debugging monitor of the number of UART messages received
   RxCounter++;
-  UART1_ICR_R = 0x40;
-  PF2 ^= 0x04;  // Heartbeat toggle
+  //4) acknowledge the interrupt by clearing the flag which requested the interrupt 
+  UART1_ICR_R = 0x40;  // this clears bit 6 (RTRIS) in the RIS register
+  // 5) toggle a heartbeat (change from 0 to 1, or from 1 to 0),  
+  PF2 ^= 0x04;
 }
 
 //------------UART1_OutString------------
