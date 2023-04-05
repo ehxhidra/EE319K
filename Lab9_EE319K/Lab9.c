@@ -106,7 +106,7 @@ int main(void){
 // Calls your InChar (FIFO get)  waiting 5 more times
 //    The next five characters after the �<� should be the ASCII representation of the distance
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
-    test()
+    test();
   }
 }
 
@@ -122,7 +122,7 @@ void Timer3A_Handler(void){
 //5) send the 8-byte message to the other computer (calls UART1_OutChar 8 times)
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 //7) toggle a heartbeat  
-  
+
 }
 
 uint32_t M;
