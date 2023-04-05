@@ -106,7 +106,6 @@ int main(void){
 // Calls your InChar (FIFO get)  waiting 5 more times
 //    The next five characters after the �<� should be the ASCII representation of the distance
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
-    test();
   }
 }
 
