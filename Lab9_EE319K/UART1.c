@@ -115,12 +115,12 @@ void UART1_OutChar(char data){
 // Use your FIFO
 uint32_t RxCounter = 0;
 void UART1_Handler(void){
-  char data;
+  char x;
   PF2 ^= 0x04;  // Heartbeat toggle
   PF2 ^= 0x04;  // Heartbeat toggle
   while((UART1_FR_R&0x0010) == 0) { // wait until RXFE bit in UART1_FR_R is 0 (should be 8 bytes)
-      data = (UART1_DR_R & 0xFF); // read last byte from UART1_DR_R
-      Fifo_Put(data);
+      x = (UART1_DR_R & 0xFF); // read last byte from UART1_DR_R
+      Fifo_Put(x);
   }
   RxCounter++;
   UART1_ICR_R = 0x40;
