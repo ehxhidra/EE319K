@@ -79,13 +79,12 @@ void UART1_Init(void){
 // then return ASCII code
 // Input: none
 // Output: char read from UART
-char x;
+
 char UART1_InChar(void){
   // write this
 //    while((UART1_FR_R&0x0010) != 0); // wait until RXFE is 0
     while(Fifo_Get() == 0) {};
-    x = Fifo_Get();
-    return x;
+    return Fifo_Get();
 }
 // Wait for new input, then return ASCII code
 
