@@ -85,6 +85,7 @@ void Timer3A_Stop(void){
 uint32_t Convert(uint32_t input){
   // copy this from Lab 8 
     return 42;
+    trdttdrd
 }
 
 
