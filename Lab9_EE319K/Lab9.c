@@ -83,9 +83,9 @@ void Timer3A_Stop(void){
 // Get fit from excel and code the convert routine with the constants
 // from the curve-fit
 uint32_t Convert(uint32_t input){
-  // copy this from Lab 8 
-    return 42;
-    trdttdrd
+  uint32_t position;
+	position = ((2241*input)/4096) + 158;
+	return position;
 }
 
 
