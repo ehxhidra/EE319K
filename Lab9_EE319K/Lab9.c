@@ -107,10 +107,13 @@ int main(void){
   EnableInterrupts();
   while(1){ // runs every 10ms
   // write this
+    
 // Calls your InChar (FIFO get) waiting until new data arrives.
 //    wait until you see the �<�byte
+
 // Calls your InChar (FIFO get)  waiting 5 more times
 //    The next five characters after the �<� should be the ASCII representation of the distance
+
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
   }
 }
