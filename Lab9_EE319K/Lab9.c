@@ -130,14 +130,14 @@ GPIO_PORTF_DATA_R ^= 0x02;
 int distance = Convert(smp);
 Fix2String(smp, msg);
 //5) send the 8-byte message to the other computer (calls UART1_OutChar 8 times)
-  UART1_OutChar(0x3C); // <
-  UART1_OutChar(msg[0]);
-  UART1_OutChar(msg[1]);
-  UART1_OutChar(msg[2]);
-  UART1_OutChar(msg[3]);
-  UART1_OutChar(msg[4]);
-  UART1_OutChar(0x3E);  // >
-  UART1_OutChar(0x0A); // LF
+UART1_OutChar(0x3C); // <
+UART1_OutChar(msg[0]);
+UART1_OutChar(msg[1]);
+UART1_OutChar(msg[2]);
+UART1_OutChar(msg[3]);
+UART1_OutChar(msg[4]);
+UART1_OutChar(0x3E);  // >
+UART1_OutChar(0x0A); // LF
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 TxCounter++;
 //7) toggle a heartbeat  
