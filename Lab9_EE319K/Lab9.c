@@ -135,7 +135,11 @@ Fix2String(Position, Message_Str);
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 TxCounter++;
 //7) toggle a heartbeat  
-GPIO_PORTF_DATA_R ^= 0x04;
+  GPIO_PORTF_DATA_R ^= 0x02;
+  int smp = ADC_In();
+  GPIO_PORTF_DATA_R ^= 0x02;
+  int dist = Convert(smp);
+  
 
 }
 
