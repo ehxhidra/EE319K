@@ -115,12 +115,16 @@ void Timer3A_Handler(void){
   // write this
 // Toggle just once if you are using TExaS logic analyzer, toggle three times when using the real scope:
 //1) toggle a heartbeat (, 
+GPIO_PORTF_DATA_R ^= 0x04;
 //2) sample the ADC
+Data = ADC_In();
 //3) toggle a heartbeat , 
+GPIO_PORTF_DATA_R ^= 0x04;
 //4) convert to distance and create the 8-byte message
 //5) send the 8-byte message to the other computer (calls UART1_OutChar 8 times)
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 //7) toggle a heartbeat  
+GPIO_PORTF_DATA_R ^= 0x04;
 
 }
 
