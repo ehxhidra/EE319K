@@ -121,9 +121,11 @@ void Timer3A_Handler(void){
 //5) send the 8-byte message to the other computer (calls UART1_OutChar 8 times)
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 //7) toggle a heartbeat  
-GPIO_PORTF_DATA_R ^= 0x02;
-
-GPIO_PORTF_DATA_R ^= 0x02;
+  GPIO_PORTF_DATA_R ^= 0x02;
+  int smp = ADC_In();
+  GPIO_PORTF_DATA_R ^= 0x02;
+  int dist = Convert(smp);
+  
 
 }
 
