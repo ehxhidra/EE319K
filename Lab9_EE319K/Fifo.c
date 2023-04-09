@@ -19,9 +19,11 @@ int32_t static Fifo[FIFO_SIZE];
 // Initializes a software FIFO of a
 // fixed size and sets up indexes for
 // put and get operations
+char FIFO[] = "";
 void Fifo_Init(void) {
 //Complete this
     PutI = GetI = 0; // empty array
+		
 }
 
 // *********** FiFo_Put**********
@@ -45,7 +47,7 @@ uint32_t Fifo_Put(char data){
 // Input: none
 // Output: If the FIFO is empty return 0
 //         If the FIFO has data, remove it, and return it
-char Fifo_Get(void){
+char Fifo_Get(int32_t *datapt){
   //Complete this routine
   if (GetI == PutI) {
           return(0);
