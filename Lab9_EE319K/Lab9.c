@@ -109,7 +109,7 @@ int main(void){
   // write this
     ST7735_SetCursor(6,0);
     int Data= 0;
-    char[] msg[5] = {};
+    char msg[5] = "";
     while(Data == 0) {Data = Fifo_Get();}
     while(Data != "<") {Data = Fifo_Get();}
 // Calls your InChar (FIFO get) waiting until new data arrives.
@@ -123,7 +123,7 @@ int main(void){
 // Calls your InChar (FIFO get)  waiting 5 more times
 //    The next five characters after the �<� should be the ASCII representation of the distance
     ST7735_OutString(msg);
-    ST7735_OutString(" cm")
+    ST7735_OutString(" cm");
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
   }
 }
