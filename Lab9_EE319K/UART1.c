@@ -122,7 +122,7 @@ void UART1_Handler(void){
   //1) toggle a heartbeat (change from 0 to 1, or from 1 to 0), 
   PF2 ^= 0x04;  
   //2) as long as the RXFE bit in the UART1_FR_R is zero (should be exactly 8 bytes, but could be more or less)
-  while((UART1_FR_R&0x0010) == 0) { 
+  while((UART1_FR_R&0x0010)==0) { 
   //   -Read a byte from UART1_DR_R 
       x = (UART1_DR_R & 0xFF); 
   //   -Put the byte into your software FIFO 
