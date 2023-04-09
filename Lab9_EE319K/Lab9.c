@@ -107,13 +107,23 @@ int main(void){
   EnableInterrupts();
   while(1){ // runs every 10ms
   // write this
-    
+    ST7735_SetCursor(6,0);
+    int Data= 0;
+    char[] msg[5] = {};
+    while(Data == 0) {Data = Fifo_Get();}
+    while(Data != "<") {Data = Fifo_Get();}
 // Calls your InChar (FIFO get) waiting until new data arrives.
 //    wait until you see the �<�byte
-
+    for (int i = 0; i<7; i++) {
+      if (i < 5) {
+        msg[i] = Fifo_Get();
+      }
+      else{Fifo_Get();}
+    }
 // Calls your InChar (FIFO get)  waiting 5 more times
 //    The next five characters after the �<� should be the ASCII representation of the distance
-
+    ST7735_OutString(msg);
+    ST7735_OutString(" cm")
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
   }
 }
