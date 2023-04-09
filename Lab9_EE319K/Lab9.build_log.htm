@@ -3,9 +3,9 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: µVision V5.38.0.0
+IDE-Version: •ÏVision V5.38.0.0
 Copyright (C) 2022 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: Yunjae Jo, UT Austin, LIC=----
+License Information: Hyukjoo Chung, UT Austin, LIC=----
  
 Tool Versions:
 Toolchain:       MDK-Lite  Version: 5.38.0.0
@@ -21,29 +21,31 @@ Target DLL:      lmidk-agdi.dll V???
 Dialog DLL:      TCM.DLL V1.56.4.0
  
 <h2>Project:</h2>
-C:\Keil_v5\EE319KwareSpring2023\Lab9_EE319K\Lab9.uvprojx
-Project File Date:  01/03/2023
+C:\Users\joshu\Documents\EE319K\EE319K\Lab9_EE319K\Lab9.uvprojx
+Project File Date:  04/05/2023
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.19', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
-Build target 'Lab9'
+Rebuild target 'Lab9'
+assembling startup.s...
 assembling BusyWait.s...
 assembling StringConversion.s...
-assembling startup.s...
 compiling TExaS.c...
 compiling Fifo.c...
 compiling ADC.c...
-UART1.c(69): warning: while loop has empty body [-Wempty-body]
-        while((UART1_FR_R&0x0020) != 0);
-                                       ^
-UART1.c(69): note: put the semicolon on a separate line to silence this warning
-1 warning generated.
 compiling UART1.c...
+Lab9.c(116): warning: result of comparison against a string literal is unspecified (use an explicit string comparison function instead) [-Wstring-compare]
+    while(Data != "<") {Data = Fifo_Get();}
+               ^  ~~~
+Lab9.c(116): warning: comparison between pointer and integer ('int' and 'char *') [-Wpointer-integer-compare]
+    while(Data != "<") {Data = Fifo_Get();}
+          ~~~~ ^  ~~~
+2 warnings generated.
 compiling Lab9.c...
 compiling ST7735.c...
 linking...
-Program Size: Code=1420 RO-data=16 RW-data=0 ZI-data=1128  
-".\Lab9.axf" - 0 Error(s), 1 Warning(s).
+Program Size: Code=4894 RO-data=1438 RW-data=4 ZI-data=1168  
+".\Lab9.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -60,8 +62,8 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   ./RTE/_Lab9
-  C:/Users/yunja/AppData/Local/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include
-  C:/Users/yunja/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C123
+  C:/Users/joshu/AppData/Local/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include
+  C:/Users/joshu/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C123
 
 <h2>Collection of Component Files used:</h2>
 

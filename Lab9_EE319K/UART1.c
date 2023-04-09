@@ -36,13 +36,13 @@ void UART1_Init(void){
     UART1_FBRD_R = 0;     // FBRD = round(0.00 * 64) = 0
     UART1_LCRH_R = 0x00000070;  // 8 bit, no parity bits, one stop, FIFOs
     UART1_CTL_R |= 0x00000001;     // enable UART
-    UART1_IM_R |= 0x10; // Arm RTRIS 여기 애매
+    UART1_IM_R |= 0x10; 
     GPIO_PORTC_AFSEL_R |= 0x30;    // enable alt funct on PC5-4
     GPIO_PORTC_DEN_R |= 0x30;      // configure PC5-4 as UART1
     GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R&0xFF00FFFF)+0x00220000;
     GPIO_PORTC_AMSEL_R &= ~0x30;   // disable analog on PC5-4
-    NVIC_PRI1_R = (NVIC_PRI1_R & 0xFF00FFFF) | 0x00400000; //여기 애매
-    NVIC_EN0_R = 0x40; //enable interrupt 6 in NVIC //여기 애매
+    NVIC_PRI1_R = (NVIC_PRI1_R & 0xFF00FFFF) | 0x00400000; 
+    NVIC_EN0_R = 0x40;
 
 }
 //// Assumes a 80 MHz bus clock, creates 115200 baud rate

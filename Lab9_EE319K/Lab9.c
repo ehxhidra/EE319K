@@ -24,6 +24,7 @@
 #include "../inc/tm4c123gh6pm.h"
 #include "UART1.h"
 #include "Fifo.h"
+#include "../inc/StringConversion.h"
 #define PF1       (*((volatile uint32_t *)0x40025008))
 #define PF2       (*((volatile uint32_t *)0x40025010))
 #define PF3       (*((volatile uint32_t *)0x40025020))
@@ -99,11 +100,12 @@ int main(void){
   // write this initialization
   // UART1 Timer3 ADC LCD
   UART1_Init();
-  Timer3A_Init(8000000,1);
+  
   ADC_Init();
   Fifo_Init();
   PortF_Init();
   ST7735_InitR(INITR_REDTAB);
+	Timer3A_Init(8000000,1);
   EnableInterrupts();
   while(1){ // runs every 10ms
   // write this
