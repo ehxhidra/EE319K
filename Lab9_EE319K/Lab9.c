@@ -140,6 +140,7 @@ UART1_OutChar(0x3E);  // >
 UART1_OutChar(0x0A); // LF
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 TxCounter++;
+//sadasdsasda
 //7) toggle a heartbeat  
 GPIO_PORTF_DATA_R ^= 0x02;
 
