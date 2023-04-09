@@ -109,7 +109,7 @@ int main(void){
   }
 }
 
-char Message_Str[12]; 
+char msg[5]; 
 void Timer3A_Handler(void){
   TIMER3_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER2A timeout
   // write this
@@ -122,14 +122,14 @@ int smp = ADC_In();
 GPIO_PORTF_DATA_R ^= 0x02;
 //4) convert to distance and create the 8-byte message
 int distance = Convert(smp);
-Fix2String(Position, Message_Str);
+Fix2String(smp, msg);
 //5) send the 8-byte message to the other computer (calls UART1_OutChar 8 times)
   UART1_OutChar(0x3C); // <
-  UART1_OutChar(Message_Str[j]);
-  UART1_OutChar(Message_Str[j]);
-  UART1_OutChar(Message_Str[j]);
-  UART1_OutChar(Message_Str[j]);
-  UART1_OutChar(Message_Str[j]);
+  UART1_OutChar(msg[0]);
+  UART1_OutChar(msg[1]);
+  UART1_OutChar(msg[2]);
+  UART1_OutChar(msg[3]);
+  UART1_OutChar(msg[4]);
   UART1_OutChar(0x3E);  // >
   UART1_OutChar(0x0A); // LF
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
