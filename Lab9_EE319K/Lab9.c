@@ -126,7 +126,6 @@ int main(void){
     }
 // Calls your InChar (FIFO get)  waiting 5 more times
 //    The next five characters after the �<� should be the ASCII representation of the distance
-    ST7735_OutString(msg);
     ST7735_OutString(" cm");
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
   }
@@ -138,11 +137,11 @@ void Timer3A_Handler(void){
   // write this
 // Toggle just once if you are using TExaS logic analyzer, toggle three times when using the real scope:
 //1) toggle a heartbeat (, 
-GPIO_PORTF_DATA_R ^= 0x02;
+GPIO_PORTF_DATA_R ^= 0x04;
 //2) sample the ADC
 int smp = ADC_In();
 //3) toggle a heartbeat , 
-GPIO_PORTF_DATA_R ^= 0x02;
+GPIO_PORTF_DATA_R ^= 0x04;
 //4) convert to distance and create the 8-byte message
 int distance = Convert(smp);
 Fix2String(smp, mesg);
@@ -158,7 +157,7 @@ UART1_OutChar(0x0A); // LF
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
 TxCounter++;
 //7) toggle a heartbeat  
-GPIO_PORTF_DATA_R ^= 0x02;
+GPIO_PORTF_DATA_R ^= 0x04;
 
   
 
