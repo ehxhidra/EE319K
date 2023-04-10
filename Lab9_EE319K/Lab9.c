@@ -24,6 +24,7 @@
 #include "../inc/tm4c123gh6pm.h"
 #include "UART1.h"
 #include "Fifo.h"
+#include "../inc/StringConversion.h"
 #define PF1       (*((volatile uint32_t *)0x40025008))
 #define PF2       (*((volatile uint32_t *)0x40025010))
 #define PF3       (*((volatile uint32_t *)0x40025020))
