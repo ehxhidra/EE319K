@@ -31,12 +31,12 @@ void UART1_Init(void){
     delay = SYSCTL_RCGCADC_R;
     delay = SYSCTL_RCGCADC_R;
     delay = SYSCTL_RCGCADC_R;
-    UART1_CTL_R &= ~0x00000001;    // disable UART
+    UART1_CTL_R &= ~0x00000002;    // disable UART
     UART1_IBRD_R = 2500;     // IBRD = int(80,000,000/(16*2000)) = int(2500)
     UART1_FBRD_R = 0;     // FBRD = round(0.00 * 64) = 0
     UART1_LCRH_R = 0x00000070;  // 8 bit, no parity bits, one stop, FIFOs
-    UART1_CTL_R |= 0x00000001;     // enable UART
-    UART1_IM_R |= 0x10; 
+    UART1_CTL_R |= 0x00000301;     // enable UART
+    UART1_IM_R |= 0x40; 
     GPIO_PORTC_AFSEL_R |= 0x30;    // enable alt funct on PC5-4
     GPIO_PORTC_DEN_R |= 0x30;      // configure PC5-4 as UART1
     GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R&0xFF00FFFF)+0x00220000;
@@ -131,7 +131,8 @@ void UART1_Handler(void){
   //3) Increment a RxCounter, used as debugging monitor of the number of UART messages received
   RxCounter++;
   //4) acknowledge the interrupt by clearing the flag which requested the interrupt 
-  UART1_ICR_R = 0x40;  // this clears bit 6 (RTRIS) in the RIS register
+  UART1_ICR_R = 0xBF;  // this clears bit 6 (RTRIS) in the RIS register
+	UART1_FR_R &= 0xEF;
   // 5) toggle a heartbeat (change from 0 to 1, or from 1 to 0),  
   PF2 ^= 0x04;
 }
