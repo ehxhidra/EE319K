@@ -106,6 +106,7 @@ int main(void){
   PortF_Init();
   ST7735_InitR(INITR_REDTAB);
 	Timer3A_Init(8000000,1);
+	ST7735_PlotClear(0,1000);
   EnableInterrupts();
   while(1){ // runs every 10ms
   // write this
@@ -118,7 +119,8 @@ int main(void){
 //    wait until you see the �<�byte
     for (int i = 0; i<7; i++) {
       if (i < 5) {
-        msg[i] = Fifo_Get();
+				ST7735_SetCursor(i+6,0);
+        ST7735_OutChar(Fifo_Get());
       }
       else{Fifo_Get();}
     }

@@ -47,14 +47,14 @@ uint32_t Fifo_Put(char data){
 // Input: none
 // Output: If the FIFO is empty return 0
 //         If the FIFO has data, remove it, and return it
-char Fifo_Get(int32_t *datapt){
+char Fifo_Get(void){
   //Complete this routine
   if (GetI == PutI) {
           return(0);
    }
-   *datapt = FIFO[GetI];
+   int32_t tmp = FIFO[GetI];
    GetI = (GetI+1)%FIFO_SIZE;
-   return(1);
+   return(tmp);
 }
 
 
