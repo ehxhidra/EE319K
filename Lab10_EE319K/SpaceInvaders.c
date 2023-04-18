@@ -333,11 +333,23 @@ void ballUpdate(void){
 void Timer1A_Handler(void){ // can be used to perform tasks in background
   TIMER1_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER1A timeout
    // execute user task
+	
+		if (Obj[0].y >= 150*16) {
+			if (life == 0) {
+				
+			}//Game over
+			else {
+				life--;
+				Obj[0].vy=0;
+			}//restart next round
+		}
+		Obj[0].vy++;
+	
 	Obj[0].oldx = Obj[0].x;
 	Obj[0].oldy = Obj[0].y;
 	Obj[0].x += Obj[0].vx;
 	Obj[0].y += Obj[0].vy;
-	ballUpdate();
+	
 }
 
 int main1(void){
@@ -433,18 +445,7 @@ int main(void){ char l;
 	Timer1_Init(1000000,1);
 	EnableInterrupts();
 	while(1){
-	
-		
-		if (Obj[0].y >= 150*16) {
-			if (life == 0) {
-				break;
-			}//Game over
-			else {
-				life--;
-				Obj[0].vy=0;
-			}//restart next round
-		}
-		Obj[0].vy++;
+		ballUpdate();
 	}
 }
 
