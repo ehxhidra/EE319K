@@ -1,7 +1,7 @@
 // Lab9.c
 // Runs on LM4F120 or TM4C123
 // Student names: solution, do not post
-// Last modification date: change this to the last modification date or look very silly
+// Last modification date: 4/2/2023
 // Last Modified: 1/2/2023
 
 // Analog Input connected to PD2=ADC1
@@ -24,7 +24,6 @@
 #include "../inc/tm4c123gh6pm.h"
 #include "UART1.h"
 #include "Fifo.h"
-#include "../inc/StringConversion.h"
 #define PF1       (*((volatile uint32_t *)0x40025008))
 #define PF2       (*((volatile uint32_t *)0x40025010))
 #define PF3       (*((volatile uint32_t *)0x40025020))
@@ -32,7 +31,7 @@
 #define PF321     (*((volatile uint32_t *)0x40025038)) // bits 3-1
 // TExaSdisplay logic analyzer shows 7 bits 0,PC5,PC4,PF3,PF2,PF1,0 
 void LogicAnalyzerTask(void){
-  UART0_DR_R = 0x80|PF321|PC54; // sends at 10kHz
+  UART0_DR_R = 0x80|PF321|PC54; // sends at 10kHz		
 }
 
 //*****the main2 is for debugging *****
@@ -83,10 +82,10 @@ void Timer3A_Stop(void){
 }
 // Get fit from excel and code the convert routine with the constants
 // from the curve-fit
-uint32_t Convert(uint32_t input){
-  uint32_t position;
-	position = ((2241*input)/4096) + 158;
-	return position;
+uint32_t Convert(uint32_t x){
+	uint32_t sum;
+	sum = ((2241*x)/4096) + 158;
+	return sum;
 }
 
 
@@ -95,71 +94,75 @@ uint32_t Convert(uint32_t input){
 // Receiver receives using RX interrupt
 int main(void){  
   DisableInterrupts();
-//  PLL_Init();
-  TExaS_Init(&LogicAnalyzerTask);
+  PLL_Init();
+//   TExaS_Init(&LogicAnalyzerTask);
   // write this initialization
   // UART1 Timer3 ADC LCD
-  UART1_Init();
-  
-  ADC_Init();
-  Fifo_Init();
-  PortF_Init();
-  ST7735_InitR(INITR_REDTAB);
-	Timer3A_Init(8000000,1);
+	UART1_Init();
+	PortF_Init();
+  ADC_Init();  	// turn on ADC, set channel to 5
+	Fifo_Init();
+  ST7735_InitR(INITR_REDTAB); 
+  Timer3A_Init(80000000/10, 1);
+	ST7735_PlotClear(0,2000); 
   EnableInterrupts();
   while(1){ // runs every 10ms
   // write this
-    ST7735_SetCursor(6,0);
-    int Data= 0;
-    char msg[5] = "";
-    while(Data == 0) {Data = Fifo_Get();}
-    while(Data != "<") {Data = Fifo_Get();}
 // Calls your InChar (FIFO get) waiting until new data arrives.
-//    wait until you see the �<�byte
-    for (int i = 0; i<7; i++) {
-      if (i < 5) {
-        msg[i] = Fifo_Get();
-      }
-      else{Fifo_Get();}
-    }
+		while (Fifo_Get() != '<') {
+		 // wait until character is '<'
+		}
+//    wait until you see the ‘<’byte
 // Calls your InChar (FIFO get)  waiting 5 more times
-//    The next five characters after the �<� should be the ASCII representation of the distance
-    ST7735_OutString(msg);
-    ST7735_OutString(" cm");
+		ST7735_SetCursor(0,0);
+		ST7735_OutChar(Fifo_Get());
+		ST7735_SetCursor(1,0);
+		ST7735_OutChar(Fifo_Get());
+		ST7735_SetCursor(2,0);
+		ST7735_OutChar(Fifo_Get());
+		ST7735_SetCursor(3,0);
+		ST7735_OutChar(Fifo_Get());
+		ST7735_SetCursor(4,0);
+		ST7735_OutChar(Fifo_Get());
+		
+		ST7735_OutString(" cm");
+
+		
+		
+//    The next five characters after the ‘<’ should be the ASCII representation of the distance
 //  Output the fixed-point number (same format as Lab 8) with units on the LCD. 
+    
   }
 }
 
-char msg[5]; 
+
+uint32_t ADCMail, ADCStatus, dist, txc;
 void Timer3A_Handler(void){
   TIMER3_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER2A timeout
   // write this
 // Toggle just once if you are using TExaS logic analyzer, toggle three times when using the real scope:
-//1) toggle a heartbeat (, 
-GPIO_PORTF_DATA_R ^= 0x02;
+//1) toggle a heartbeat (,
+	PF2 ^= 0x04;
 //2) sample the ADC
-int smp = ADC_In();
-//3) toggle a heartbeat , 
-GPIO_PORTF_DATA_R ^= 0x02;
+	ADCMail = ADC_In();
+	ADCStatus = 1;
+//3) toggle a heartbeat ,
+	PF2 ^= 0x04;
 //4) convert to distance and create the 8-byte message
-int distance = Convert(smp);
-Fix2String(smp, msg);
+	dist = Convert(ADCMail);
 //5) send the 8-byte message to the other computer (calls UART1_OutChar 8 times)
-UART1_OutChar(0x3C); // <
-UART1_OutChar(msg[0]);
-UART1_OutChar(msg[1]);
-UART1_OutChar(msg[2]);
-UART1_OutChar(msg[3]);
-UART1_OutChar(msg[4]);
-UART1_OutChar(0x3E);  // >
-UART1_OutChar(0x0A); // LF
+	UART1_OutChar(0x3C);
+	UART1_OutChar(dist/1000+0x30);
+	UART1_OutChar('.');
+	UART1_OutChar(dist%1000/100+0x30);
+	UART1_OutChar(dist%100/10+0x30);
+	UART1_OutChar(dist%10+0x30);
+	UART1_OutChar('>');
+	UART1_OutChar(0x0A);
 //6) increment a TxCounter, used as debugging monitor of the number of ADC samples collected 
-TxCounter++;
+	txc++;
 //7) toggle a heartbeat  
-GPIO_PORTF_DATA_R ^= 0x02;
-
-  
-
+	PF2 ^= 0x04;
 }
 
 uint32_t M;
@@ -174,6 +177,8 @@ void MyFifo_Init(uint32_t size);
 uint32_t MyFifo_Put(char data);
 char MyFifo_Get(void);
 uint32_t FifoError;
+
+//main2
 int main2(void){ // Make this main to test Fifo
   char me,you;
   char data;
@@ -184,7 +189,7 @@ int main2(void){ // Make this main to test Fifo
   M = 4; // seed
   FifoError = 0;
   // size =17 means FIFO can store up to 16 elements
-  MyFifo_Init(17); // change 17 to match your FIFO size
+  MyFifo_Init(9); // change 17 to match your FIFO size
   for(uint32_t i = 0; i<10000; i++){
     uint32_t k = Random(4);
     for(uint32_t l=0; l<k ;l++){
@@ -233,4 +238,3 @@ int main2(void){ // Make this main to test Fifo
     }
   }
 }
-
