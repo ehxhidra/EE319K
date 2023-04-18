@@ -323,10 +323,12 @@ const unsigned short bimage[] = {
 
 
 void ballUpdate(void){
-   if(life != 0){
-     ST7735_DrawBitmap((Obj[0].oldx/FIX)-4,(Obj[0].oldy/FIX)-4,bimage,7,7);
-     ST7735_DrawBitmap((Obj[0].x/FIX)-4,(Obj[0].y/FIX)-4,ball,7,7);
-   }
+	if(life != 0){
+		if(Obj[0].oldx != Obj[0].x || Obj[0].oldy != Obj[0].y){
+			ST7735_DrawBitmap((Obj[0].oldx/FIX)-4,(Obj[0].oldy/FIX)-4,bimage,7,7);
+			ST7735_DrawBitmap((Obj[0].x/FIX)-4,(Obj[0].y/FIX)-4,ball,7,7);
+		}
+	}
 }
 
 	
@@ -340,7 +342,9 @@ void Timer1A_Handler(void){ // can be used to perform tasks in background
 			}//Game over
 			else {
 				life--;
-				Obj[0].vy=0;
+				Obj[0].x=124*16;
+				Obj[0].y = 149*16;
+				Obj[0].vy=-60;
 			}//restart next round
 		}
 		Obj[0].vy++;
@@ -445,7 +449,9 @@ int main(void){ char l;
 	Timer1_Init(1000000,1);
 	EnableInterrupts();
 	while(1){
-		ballUpdate();
+		if (Obj[0].oldx != Obj[0].x || Obj[0].oldy != Obj[0].y) {
+			ballUpdate();
+		}
 	}
 }
 
