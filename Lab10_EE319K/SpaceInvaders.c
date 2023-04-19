@@ -31,6 +31,7 @@
 #include "../inc/ADC.h"
 #include "Images.h"
 #include "../inc/wave.h"
+#include "Timer0.h"
 #include "Timer1.h"
 
 void DisableInterrupts(void); // Disable interrupts
@@ -300,19 +301,23 @@ const unsigned short walleR[] = {
  0x0000, 0x0000,
 };
 
-
-struct Physics {
-	uint32_t x;
-	uint32_t y;
-	uint32_t oldx;
-	uint32_t oldy;
-	uint32_t vx;
-	uint32_t vy;
-};
-#define Ball 0
-typedef struct Physics Physics_t;
-Physics_t Obj[1]={640,128,0,0,0,0};
+//CONSTANTS
 #define FIX 16
+#define Ball 0
+struct Physics {
+	int32_t x;
+	int32_t y;
+	int32_t oldx;
+	int32_t oldy;
+	int32_t vx;
+	int32_t vy;
+};
+
+typedef struct Physics Physics_t;
+Physics_t Obj[1]={640/16*FIX,128/16*FIX,0,0,0,0};
+uint8_t resume = 1;
+float df1 = 0.95;
+float df2 = 0.99985;
 int life;
 const unsigned short bimage[] = {
  0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -331,29 +336,38 @@ void ballUpdate(void){
 	}
 }
 
-	
+
 void Timer1A_Handler(void){ // can be used to perform tasks in background
   TIMER1_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER1A timeout
    // execute user task
 	
-		if (Obj[0].y >= 150*16) {
+		if (Obj[0].y >= 150*FIX) {
 			if (life == 0) {
 				
 			}//Game over
 			else {
 				life--;
-				Obj[0].x=124*16;
-				Obj[0].y = 149*16;
-				Obj[0].vy=-60;
+				Obj[0].x=114*FIX;
+				Obj[0].y = 60*FIX;
+				
+				Obj[0].vy=-20/16*FIX ;
+				Obj[0].vx=-0/16*FIX ;
 			}//restart next round
 		}
-		Obj[0].vy++;
-	
-	Obj[0].oldx = Obj[0].x;
-	Obj[0].oldy = Obj[0].y;
-	Obj[0].x += Obj[0].vx;
-	Obj[0].y += Obj[0].vy;
-	
+		if (Obj[0].x < 4*FIX || Obj[0].x > 124*FIX) {
+			Obj[0].vx = -df1*Obj[0].vx;
+		}
+		if (Obj[0].y < 4*FIX) {
+			Obj[0].vy = -df1*Obj[0].vy;
+		}
+	if (resume) {
+		Obj[0].vy += FIX/16;
+		Obj[0].vx *= df2;
+		Obj[0].oldx = Obj[0].x;
+		Obj[0].oldy = Obj[0].y;
+		Obj[0].x += Obj[0].vx;
+		Obj[0].y += Obj[0].vy;
+	}
 }
 
 int main1(void){
@@ -393,6 +407,26 @@ int main1(void){
 
 }
 
+// **************Key_Init*********************
+// Initialize piano key inputs on PA5-2 or PE3-0
+// Input: none 
+// Output: none
+void Key_Init(void){ 
+  // used in Lab 6 
+	volatile uint8_t del;
+	SYSCTL_RCGCGPIO_R |= 0x10;
+	del = 100;
+	GPIO_PORTE_DEN_R |= 0x0F;
+	GPIO_PORTE_DIR_R &= ~(0x0F);
+}
+// **************Key_In*********************
+// Input from piano key inputs on PA5-2 or PE3-0
+// Input: none 
+// Output: 0 to 15 depending on keys
+//   0x01 is just Key0, 0x02 is just Key1, 0x04 is just Key2, 0x08 is just Key3
+uint32_t Key_In(void){ 
+	return GPIO_PORTE_DATA_R & 0x0F;
+}
 
 // You can't use this timer, it is here for starter code only 
 // you must use interrupts to perform delays
@@ -405,6 +439,8 @@ void Delay100ms(uint32_t count){uint32_t volatile time;
     count--;
   }
 }
+
+
 typedef enum {English, Spanish, Portuguese, French} Language_t;
 Language_t myLanguage=English;
 typedef enum {HELLO, GOODBYE, LANGUAGE} phrase_t;
@@ -426,11 +462,104 @@ const char *Phrases[3][4]={
   {Language_English,Language_Spanish,Language_Portuguese,Language_French}
 };
 
+
+// Inputs: rect1 is x1,y1,w1,h1 the first rectangle
+//         rect2 is x2,y2,w2,h2 the second rectangle
+// Output: 1 if the rectangles overlap
+//         0 if the rectances do not overlap
+// Notes: x1 is rect1[0]  x2 is rect2[0]
+//        y1 is rect1[1]  y2 is rect2[1]
+//        w1 is rect1[2]  w2 is rect2[2]
+//        h1 is rect1[3]  h2 is rect2[3]
+struct Boundary {
+	int32_t x;
+	int32_t y;
+	int32_t w;
+	int32_t h;
+};
+
+typedef struct Boundary Boundary_t;
+Boundary_t Obj2[5]={
+	{25, 30, 13,13},
+	{58, 60, 13,13},
+	{90, 30, 13,13},
+	{8, 108, 6,35},
+	{114, 108, 6,35}
+};
+
+
+// The input/output values will be displayed in the UART window
+int32_t OverLap(int32_t rect1[4], int32_t rect2[4]){
+// Replace this following line with your solution
+  if(rect1[0]<=rect2[0]+rect2[2]&&rect1[0]>=rect2[0]&&((rect1[1]<=rect2[1]-rect2[3]+1&&rect1[1]>=rect2[1])||(rect1[1]-rect1[3]+1>=rect2[1]&&rect1[1]>=rect2[1]))){
+		if (Obj[0].y >= rect2[1]) {return 3;}
+		else if (Obj[0].y <= rect2[1]+rect2[3]) {return 4;}
+		return 1;
+  }
+	if(rect1[0]+rect1[2]>rect2[0]&&rect2[0]>=rect1[0]&&((rect1[1]<=rect2[1]-rect2[3]+1&&rect1[1]>=rect2[1])||(rect1[1]-rect1[3]+1>=rect2[1]&&rect1[1]>=rect2[1]))){
+		if (Obj[0].y <= rect2[1]) {return 3;}
+		else if (Obj[0].y >= rect2[1]+rect2[3]) {return 4;}
+		return 2;
+	}
+	
+  else{
+    return 0;
+  }
+	
+}
+
+int32_t CollisionA(int32_t x, int32_t y){
+	int tmp = 0;
+	int32_t in1[4] = {x,y,7,7};
+	for (int i = 0; i < 5; i++){
+		int32_t in2[4] = {Obj2[i].x,Obj2[i].y,Obj2[i].w,Obj2[i].h};
+		tmp |= OverLap(in1,in2)<<i*3;
+	}
+	return tmp;
+}
+int dupe = 0;
+int err = 0;
+uint8_t OPL;
+void Timer0A_Handler(void){
+	TIMER0_ICR_R = TIMER_ICR_TATOCINT;
+	int tmp2 = CollisionA((Obj[0].x/FIX)-4,(Obj[0].y/FIX)-4);
+	int tmp3 = 0;
+	OPL = 0;
+	dupe = err & tmp2;
+	tmp2 &= ~dupe;
+	err = dupe;
+	int div1 = 7;
+	for (int i = 0; i < 5; i++) {
+		tmp3 = (tmp2 & div1) >> 3*i;
+		if(tmp3){
+			if (tmp3 <= 2 && OPL%2 == 0) {
+				Obj[0].vx = -Obj[0].vx;
+				OPL |= 1;
+			}
+			else if (tmp3 >= 3 && OPL%2 == 1){
+				OPL &= ~0x01;
+			}
+		if (tmp3 >= 3&& OPL>>1 == 0) {
+			Obj[0].vy = -Obj[0].vy;
+			OPL |= 2;
+		}
+		else if (tmp3 <= 2 && OPL>>1 == 1){
+			OPL &= ~0x02;
+		}
+		}
+		else {
+			OPL = 0;
+		}
+		div1 *= 8;
+	}
+}
+
+
 int main(void){ char l;
   DisableInterrupts();
   TExaS_Init(NONE);       // Bus clock is 80 MHz 
   Output_Init();
-
+	Key_Init();
   Random_Init(1);
   ST7735_FillScreen(0x0000);            // set screen to black
   ST7735_DrawBitmap(25, 30, bumper, 13,13); // player ship bottom
@@ -446,11 +575,21 @@ int main(void){ char l;
   ST7735_DrawBitmap(34, 135, flipperL, 25,6); // player ship bottom
 	ST7735_DrawBitmap(69, 135, flipperR, 25,6); // player ship bottom
 	life = 3;
-	Timer1_Init(1000000,1);
+	Timer0_Init(400000,0);
+	Timer1_Init(400000,1);
 	EnableInterrupts();
+	uint8_t IPL = 0;
 	while(1){
 		if (Obj[0].oldx != Obj[0].x || Obj[0].oldy != Obj[0].y) {
 			ballUpdate();
+		}
+		if (Key_In() && IPL == 0) {
+			if (resume == 1) {resume = 0;}
+			else {resume = 1;}
+			IPL = 1;
+		}
+		if (Key_In() == 0 && IPL != 0) {
+			IPL = 0;
 		}
 	}
 }
